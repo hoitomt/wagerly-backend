@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  wagerly-backend:
+    build: .
+    ports:
+      - "8080:8080"
+    command: tail -f /dev/null
+    networks:
+      - wagerly_backend_network
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/workdir
+      - ~/.ssh:/root/.ssh
+      - ~/.gitconfig:/root/.gitconfig
+  db:
+    image: 'postgres:15.1-alpine'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - wagerly_backend_network
+volumes:
+  db-data:
+networks:
+  wagerly_backend_network:
